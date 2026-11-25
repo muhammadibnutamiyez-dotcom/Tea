@@ -1,0 +1,15 @@
+name: Build telegram-bot-api
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build di Debian Bullseye
+        run: |
+          mkdir out
+          docker run --rm -v "$PWD/out:/out" debian:bullseye bash -c "apt-get update && apt-get install -y make git zlib1g-dev libssl-dev gperf cmake g++ && git clone --recursive https://github.com/tdlib/telegram-bot-api.git && cd telegram-bot-api && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install -j2 && strip /usr/local/bin/telegram-bot-api && cp /usr/local/bin/telegram-bot-api /out/"
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: telegram-bot-api
+          path: out/telegram-bot-api
